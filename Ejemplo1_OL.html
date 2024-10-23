@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ejemplo con API y capas</title>
+    <link rel="stylesheet" type="text/css" href="https://openlayers.org/en/v6.5.0/css/ol.css">
+    <script type="text/javascript" src="https://openlayers.org/en/v6.5.0/build/ol.js"></script>
+    <script type="text/javascript" src="capas_inegiwmsOL.js"></script>
+    <link rel="stylesheet" type="text/css" href="styleOL.css">
+</head>
+<body>
+    <!-- Contenedor del mapa -->
+    <div style="width: 100%; height: 500px" id="map"></div>
+
+    <!-- Caja para seleccionar las capas -->
+    <div style="position: absolute; top:40%;left: 24px; width: 250px; height: 195px; background-color: white; padding: 16px"> 
+        <h5 style="padding-left: 0px;">Selecciona las capas que quieras mostrar sobre el mapa</h5>
+                 
+        <!-- Checkboxes para las capas de Localidades y Manzanas -->
+        <h5 style="font-size: 14px; font-weight:bold;">División territorial</h5>
+        <p style="font-size: 14px;">
+            <input id="chkEstatal" name="capas" type="checkbox" onclick="ActivaCapa(this);"/> Localidades
+        </p>
+        <p style="font-size: 14px;">
+            <input id="chkMunicipal" name="capas" type="checkbox" onclick="ActivaCapa(this);"/> Manzanas
+        </p>
+    </div>
+
+    <!-- Contenedor para el mensaje a mostrar -->
+    <div id="textoGenerico" style="padding: 20px; font-size: 18px;"></div>
+
+    <!-- Botón para actualizar el mensaje -->
+    <div style="padding: 20px;">
+        <button onclick="actualizarMensaje()">Actualizar mensaje</button>
+    </div>
+
+    <script>
+        // Función que inicializa el mapa, la selección de capas y obtiene el mensaje del API
+        function inicializaPagina() {
+            // Inicializar el mapa
+            inicializa();
+
+            // Obtener y mostrar el mensaje desde el API
+            fetch('http://localhost:3000/api/mensaje')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('textoGenerico').innerText = data.mensaje;
+                });
+        }
+
+        // Función para actualizar el mensaje con un POST
+        function actualizarMensaje() {
+            const nuevoMensaje = prompt('Ingresa un nuevo mensaje:');
+            if (nuevoMensaje) {
+                fetch('http://localhost:3000/api/mensaje', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nuevoMensaje })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('textoGenerico').innerText = data.mensaje;
+                });
+            }
+        }
+
+        // Ejecutar la inicialización de la página cuando cargue
+        window.onload = inicializaPagina;
+    </script>
+</body>
+</html>
